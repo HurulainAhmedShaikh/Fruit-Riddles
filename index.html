@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-image: url('all fruits.webp');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgb(89, 30, 30);
+        }
+
+        .quiz-container {
+            position: relative;
+            text-align: center;
+            background-color: rgb(255, 255, 255);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgb(255, 255, 255);
+            width: 90%;
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .question-box h2 {
+            margin-bottom: 20px;
+            font-size: calc(16px + 1vw);
+        }
+
+        .options {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .options li {
+            margin: 10px 0;
+        }
+
+        .options button {
+            padding: 15px 20px;
+            background-color: bisque;
+            color: rgb(89, 30, 30);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: calc(14px + 0.5vw);
+            width: 100%;
+            max-width: 400px;
+            transition: all 0.3s ease;
+        }
+
+        .options button:hover:not([disabled]) {
+            background-color: rgb(135, 222, 212);
+        }
+
+        .options button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .options button.correct-answer {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .options button.wrong-answer {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: calc(16px + 0.5vw);
+            font-weight: bold;
+            min-height: 30px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .correct {
+            color: #4CAF50;
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+
+        .incorrect {
+            color: #f44336;
+            background-color: rgba(244, 67, 54, 0.1);
+        }
+
+        #next-btn {
+            margin-top: 20px;
+            background-color: rgb(0, 28, 139);
+            color: white;
+            font-size: calc(14px + 0.5vw);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        #next-btn:hover {
+            background-color: blueviolet;
+        }
+
+        .score {
+            margin-top: 20px;
+            font-size: calc(16px + 0.5vw);
+            font-weight: bold;
+        }
+
+        .timer {
+            font-size: calc(24px + 1vw);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .fruit-clock {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: burlywood;
+            color: rgb(89, 30, 30);
+            line-height: 60px;
+            font-weight: bold;
+        }
+
+        #final-score {
+            text-align: center;
+            padding: 40px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #final-score p {
+            font-size: calc(18px + 0.5vw);
+            color: rgb(27, 34, 226);
+            margin: 20px;
+        }
+
+        #final-score span {
+            font-size: calc(20px + 0.5vw);
+            font-weight: bold;
+            color: black;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 20px;
+                width: 95%;
+            }
+            
+            .options button {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <audio id="backgroundMusic" autoplay loop>
+        <source src="Music.mp3" type="audio/mpeg">
+        <source src="Music.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="timer">
+                <div class="fruit-clock">
+                    <span id="time-display">20</span>
+                </div>
+            </div>
+            <div id="question-text" class="question-box"></div>
+            <ul class="options" id="options-list"></ul>
+            <div id="result" class="result"></div>
+            <button id="next-btn" style="display: none;">Next Question 🚀</button>
+        </div>
+        <div id="final-score" style="display: none;">
+            <p>Your Final Results</p>
+            <p>Your Score: <span id="score">0</span> / 17</p>
+            <p>Correct Answers: <span id="correct-answers">0</span></p>
+            <p>Errors: <span id="errors">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "I am yellow and always smiling. Who am I?",
+                options: ["Apple", "Banana", "Orange", "Grapes"],
+                correctAnswer: "B"
+            },
+            {
+                question: "I'm round and red, and a teacher loves me. What am I?",
+                options: ["Strawberry", "Apple", "Cherry", "Peach"],
+                correctAnswer: "B"
+            },
+            {
+                question: "I have a thick skin and vitamin C, I'm sweet and tangy inside. What am I?",
+                options: ["Orange", "Lemon", "Grapefruit", "Apple"],
+                correctAnswer: "A"
+            },
+            {
+                question: "I'm green on the outside, red on the inside, and I have many seeds. What am I?",
+                options: ["Apple", "Grapes", "Watermelon", "Kiwi"],
+                correctAnswer: "C"
+            },
+            {
+                question: "I have a crown but am not a king, I grow on a tree and am very sweet. What am I?",
+                options: ["Mango", "Pineapple", "Papaya", "Lemon"],
+                correctAnswer: "B"
+            },
+            {
+                question: "I have no skin, but I am covered in a lot of tiny hairs. What am I?",
+                options: ["Peach", "Pineapple", "Grapes", "Kiwi"],
+                correctAnswer: "D"
+            },
+            {
+                question: "I'm purple, green, and red fruit, small and round. I grow in bunches. What am I?",
+                options: ["Grapes", "Plum", "Cherry", "Blueberry"],
+                correctAnswer: "A"
+            },
+            {
+                question: "I'm small and red, and I grow in a bush. What am I?",
+                options: ["Cherry", "Raspberry", "Blueberry", "Strawberry"],
+                correctAnswer: "D"
+            },
+            {
+                question: "I'm very juicy and can be used to make juice. I'm yellow or green. What am I?",
+                options: ["Apple", "Lemon", "Grape", "Peach"],
+                correctAnswer: "B"
+            },
+            {
+                question: "I'm tiny, round, and often found in jam. What am I?",
+                options: ["Raspberry", "Strawberry", "Blueberry", "Grapes"],
+                correctAnswer: "A"
+            },
+            {
+                question: "My name is common but I am very special and unique. What am I?",
+                options: ["Mango", "Papaya", "Pineapple", "Banana"],
+                correctAnswer: "A"
+            },
+            {
+                question: "I'm orange and sweet, with black seeds inside. What am I?",
+                options: ["Mango", "Papaya", "Orange", "Peach"],
+                correctAnswer: "B"
+            },
+            {
+                question: "I have many seeds, red and bright. What am I?",
+                options: ["Apple", "Pomegranate", "Grapes", "Watermelon"],
+                correctAnswer: "B"
+            },
+            {
+                question: "I'm light green outside, light orange inside. What am I?",
+                options: ["Cantaloupe", "Kiwi", "Papaya", "Muskmelon"],
+                correctAnswer: "D"
+            },
+            {
+                question: "I have a hard shell and water inside. What am I?",
+                options: ["Papaya", "Mango", "Coconut", "Pineapple"],
+                correctAnswer: "C"
+            },
+            {
+                question: "I'm green outside and pink inside. What am I?",
+                options: ["Apple", "Guava", "Orange", "Peach"],
+                correctAnswer: "B"
+            },
+            {
+                question: "I'm small, sweet, and grow on a palm tree. What am I?",
+                options: ["Date", "Plum", "Fig", "Raisin"],
+                correctAnswer: "A"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        let timer;
+        let timeLeft = 20;
+        let answerSelected = false;
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 20;
+            updateTimerDisplay();
+
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById("time-display").textContent = timeLeft;
+        }
+
+        function handleTimeout() {
+            if (!answerSelected) {
+                incorrectAnswers++;
+                showResult(false);
+                highlightCorrectAnswer();
+                disableOptions();
+            }
+        }
+
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById("question-text").innerHTML = 
+                `<h2>Question ${currentQuestionIndex + 1}: ${question.question}</h2>`;
+
+            const optionsList = document.getElementById("options-list");
+            optionsList.innerHTML = question.options
+                .map((option, index) => `
+                    <li>
+                        <button onclick="checkAnswer('${String.fromCharCode(65 + index)}')" class="option-btn" data-option="${String.fromCharCode(65 + index)}">
+                            ${String.fromCharCode(65 + index)}) ${option}
+                        </button>
+                    </li>
+                `).join("");
+
+            document.getElementById("result").innerHTML = "";
+            document.getElementById("next-btn").style.display = "none";
+            answerSelected = false;
+            startTimer();
+        }
+
+        function highlightCorrectAnswer() {
+            const question = questions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach(button => {
+                const option = button.getAttribute('data-option');
+                if (option === question.correctAnswer) {
+                    button.classList.add('correct-answer');
+                }
+            });
+        }
+
+        function disableOptions() {
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(button => button.disabled = true);
+        }
+
+        function showResult(isCorrect) {
+            const resultDiv = document.getElementById("result");
+            const question = questions[currentQuestionIndex];
+            
+            if (isCorrect) {
+                resultDiv.innerHTML = "Correct! 🎉";
+                resultDiv.className = "result correct";
+            } else {
+                resultDiv.innerHTML = `Wrong! The correct answer is ${question.correctAnswer}) ${question.options["ABCD".indexOf(question.correctAnswer)]} 🔍`;
+                resultDiv.className = "result incorrect";
+            }
+            
+            document.getElementById("next-btn").style.display = "inline-block";
+        }
+
+        function checkAnswer(selected) {
+            if (answerSelected) return;
+            
+            answerSelected = true;
+            clearInterval(timer);
+            
+            const question = questions[currentQuestionIndex];
+            const isCorrect = selected === question.correctAnswer;
+            const selectedButton = document.querySelector(`button[data-option="${selected}"]`);
+            
+            if (isCorrect) {
+                score++;
+                correctAnswers++;
+                selectedButton.classList.add('correct-answer');
+            } else {
+                incorrectAnswers++;
+                selectedButton.classList.add('wrong-answer');
+                highlightCorrectAnswer();
+            }
+            
+            showResult(isCorrect);
+            disableOptions();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion();
+            } else {
+                showFinalScore();
+            }
+        }
+
+        function showFinalScore() {
+            document.getElementById("quiz").style.display = "none";
+            const finalScoreDiv = document.getElementById("final-score");
+            finalScoreDiv.style.display = "block";
+            
+            document.getElementById("score").textContent = score;
+            document.getElementById("correct-answers").textContent = correctAnswers;
+            document.getElementById("errors").textContent = incorrectAnswers;
+        }
+
+        // Event listeners
+        document.getElementById("next-btn").addEventListener("click", nextQuestion);
+
+        // Start the quiz when the page loads
+        window.onload = displayQuestion;
+    </script>
+</body>
+</html>

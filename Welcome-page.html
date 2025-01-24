@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Page</title>
+    <style>
+        body {
+            background-image: url('quiz w.webp');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            display: flex; /* Using Flexbox for centering */
+            justify-content: center; /* Horizontally center the content */
+            align-items: center; /* Vertically center the content */
+            text-align: center;
+            flex-direction: column; /* Align items vertically */
+        }
+        
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 25px;
+            font-weight: bold;
+            background-color: rgb(0, 28, 139);
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color:blueviolet;
+        }
+
+        #welcome h1{
+            color:brown;
+            font-size:50px;
+        }
+
+        #rules {
+            display: none;
+            text-align: center;
+            background-color: #FFB6C1;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            color: purple;
+            font-size: 30px;
+        }
+
+        #rules h3 {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        #rules ul {
+            text-align: left;
+        }
+
+        #rules ul li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="welcome">
+        <h1>Welcome to Fruit Riddle Quiz!</h1><br>
+        <h1>Know about your knowledge of fruits.</h1><br>
+        <h1>Let's go</h1><br>
+    </div>
+    
+    <button class="btn" onclick="showRules()">Let us Begin</button>
+    
+    <audio src="Music.mp3" autoplay loop>o</audio>
+
+    <!-- Rule Page -->
+    <div id="rules">
+        <h1>Quiz Rules</h1>
+        <ul>
+            <li>Each question will have 4 options.</li><br>
+            <li>You have 10 seconds to answer each question.</li><br>
+            <li>Click the correct answer to score points.</li><br>
+            <li>You will lose points for incorrect answers and if time is up.</li><br>
+            <li>Good luck and have fun!</li><br>
+        </ul>
+        <button class="btn" onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <script>
+        // Function to show rules
+        function showRules() {
+            document.getElementById("welcome").style.display = "none";  // Hide the welcome section
+            document.querySelector(".btn").style.display = "none";      // Hide the 'Let us Begin' button
+            document.getElementById("rules").style.display = "block";   // Show the rules section
+        }
+    
+        // Function to start the quiz and redirect to the quiz page
+        function startQuiz() {
+            window.location.href = "quiz.html";  // Redirect to the quiz page
+        }
+    </script>
+    
+
+</body>
+</html>
